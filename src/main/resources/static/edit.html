@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Elastic Demo</title>
+
+<!-- 	Edit or add melody page -->
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<!-- jquery -->
+	<script src="./webjars/jquery/3.1.1/jquery.min.js"></script>
+
+	<!-- jquery-ui -->
+	<script src="./webjars/jquery-ui/1.12.1/jquery-ui.min.js"></script>
+	<link rel="stylesheet" href="./webjars/jquery-ui/1.12.1/jquery-ui.min.css" />
+
+	<!-- datatables -->
+	<script src="./webjars/datatables/1.10.19/js/jquery.dataTables.min.js"></script>
+	<link rel="stylesheet" href="./webjars/datatables/1.10.19/css/dataTables.jqueryui.min.css" />
+	
+ 	<script type="text/javascript">
+ 		
+ 		$(document).ready(function() {
+ 			let id = get('id');
+ 			if (id != null) {
+ 				$.ajax({
+	                url: './melody/' + id,
+    	            contentType: 'application/json; charset=utf-8',
+        	        method: 'GET'
+         		}).done(function(data, textStatus, jqXHR) {
+         			$('#idMelody').val(data.idMelody);
+         			$('#title').val(data.title);
+         			$('#artist').val(data.artist);
+         			$('#lyric').html(data.lyric);
+         		}).fail(function(jqXHR, textStatus, errorThrown) {
+            		alert(jqXHR.responseText);
+         		});
+ 			}
+ 		});
+ 		
+ 		function get(name){
+ 		   if(name=(new RegExp('[?&]'+encodeURIComponent(name)+'=([^&]*)')).exec(location.search))
+ 		      return decodeURIComponent(name[1]);
+ 		}
+	        
+    </script>
+	
+</head>
+<body>
+	<h3>Melody</h3>
+	<a href="./">Back to list</a>
+	<br><br>
+	<form method="post" action="./edit">
+		<label for="idMelody">Id:&nbsp;</label>
+		<input type="text" readonly="readonly" id="idMelody" name="idMelody" size="10">
+		<br><br>
+		<label for="title">Title:&nbsp;</label>
+		<input type="text" id="title" name="title" size="50">
+		<br><br>
+		<label for="artist">Artist:&nbsp;</label>
+		<input type="text" id="artist" name="artist" size="50">
+		<br><br>
+		<label for="lyric">Lyric:&nbsp;</label>
+		<br>
+		<textarea name="lyric" id="lyric" cols="120" rows="15">
+		</textarea>
+		<br><br>
+		<button type="submit">Save</button>
+	</form>	
+</body>
+</html>

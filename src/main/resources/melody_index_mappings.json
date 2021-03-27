@@ -1,0 +1,28 @@
+{
+  "index" : {
+    	"properties" : {
+    		"id_melody" : {
+    			"type" : "keyword",
+    			"store" : true
+    		},
+    		"title" : {
+    			"type" : "text",
+    			"analyzer" : "standard_edge_ngram" 
+    		},
+    		"artist" : {
+    			"type" : "text",
+    			"analyzer" : "standard_edge_ngram"
+    		},
+    		"lyric" : {
+    			"type" : "text",
+    			"analyzer" : "standard_ngram",
+    			"fields" : {
+    				"ru" : {
+    					"type" : "text",
+    					"analyzer" : "russian_stemmer"	
+    				}
+    			}
+    		}
+    	} 	
+  }
+}

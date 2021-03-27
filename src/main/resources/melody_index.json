@@ -1,0 +1,70 @@
+{
+  "melody" : {
+  	"settings" : {
+  		"analysis" : {
+  			"filter" : {
+  				"edge_ngram_15" : {
+					"type" : "edge_ngram",
+					"min_gram" : 1,
+					"max_gram" : 15  				
+  				},
+  				"3_15_ngram" : {
+					"type" : "ngram",
+					"min_gram" : 3,
+					"max_gram" : 15  				
+  				},
+  				"russian_stemmer" : {
+  					"type" : "stemmer",
+  					"language" : "russian"
+  				}
+  			},
+  			"analyzer" : {
+  				"standard_edge_ngram" : {
+					"tokenizer" : "short_tokenizer",
+					"filter" : ["lowercase", "edge_ngram_15"]  				
+  				},
+  				"standard_ngram" : {
+					"tokenizer" : "short_tokenizer",
+					"filter" : ["lowercase", "3_15_ngram"]  				
+  				},
+  				"russian_analyzer" : {
+  					"tokenizer" : "short_tokenizer",
+  					"filter" : ["lowercase", "russian_stemmer"]
+  				}
+  			},
+  			"tokenyzer" : {
+  				"short_tokenizer" : {
+  					"type" : "classic",
+  					"max_token_length" : 15
+  				}
+  			}
+  		}
+  	},
+    "mappings" : {
+    	"properties" : {
+    		"id_melody" : {
+    			"type" : "keyword",
+    			"store" : true
+    		},
+    		"title" : {
+    			"type" : "text",
+    			"analyzer" : "standard_edge_ngram" 
+    		},
+    		"artist" : {
+    			"type" : "text",
+    			"analyzer" : "standard_edge_ngram"
+    		},
+    		"lyric" : {
+    			"type" : "text",
+    			"analyzer" : "standard_ngram",
+    			"fields" : {
+    				"ru" : {
+    					"type" : "text",
+    					"analyzer" : "russian_stemmer"	
+    				}
+    			}
+    		}
+    	} 	
+    }
+  }
+}

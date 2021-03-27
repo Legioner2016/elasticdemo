@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Elastic Demo</title>
+
+<!-- 	List melodies page -->
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<!-- jquery -->
+	<script src="./webjars/jquery/3.1.1/jquery.min.js"></script>
+
+	<!-- jquery-ui -->
+	<script src="./webjars/jquery-ui/1.12.1/jquery-ui.min.js"></script>
+	<link rel="stylesheet" href="./webjars/jquery-ui/1.12.1/jquery-ui.min.css" />
+
+	<!-- datatables -->
+	<script src="./webjars/datatables/1.10.19/js/jquery.dataTables.min.js"></script>
+	<link rel="stylesheet" href="./webjars/datatables/1.10.19/css/dataTables.jqueryui.min.css" />
+	
+ 	<script type="text/javascript">
+ 			var table;
+	        $(document).ready(function() {
+		
+   	            table = $('#datatable').DataTable( {
+   	                "processing": true,
+   	                "serverSide": true,
+   	                "searching":false,
+   	             	"ordering":true,
+   	                "dom": 'rtipl',
+   	                "pageLength" : 20,
+   	             	"lengthMenu" : [20],
+   	                "ajax": {
+   	                        "contentType": "application/json",
+   	                        "url": "./melodies",
+   	                        "type": "post",
+   	                        "data": function (d) {
+   	                        	for (var i = 0; i < d.columns.length; i++) {
+   	         		        		column = d.columns[i];
+   	         		        		delete(column.search);
+   	       		    			}
+   	                        	d.id = $('#id').val();
+   	                        	d.title = $('#title').val();
+   	                        	d.artist = $('#artist').val();
+   	                        	d.lyric = $('#lyric').val();
+   	                        	d.lyricRu = $('#lyric_ru').val() === 'on';
+   	                            return JSON.stringify(d);
+   	                        }   	                        
+   	                },
+   	                "columns": [
+   	                    {"data":"idMelody"},
+   	                 	{"data":null, render:actionRenderer},
+   	                    {"data":"title"},
+   	                    {"data":"artist"},
+   	                 	{"data":"tags"},
+   	                    {"data":"lyric"}
+   	                ],
+    				 columnDefs: [
+       			       { targets: [0, 1, 2, 3, 4, 5], "className": "dt-center", "orderable":false, "searchable":false}
+       			    ]
+   	            } );
+
+   	            $('.filter-concurrent').on('change', function() {
+   	            	let val = $(this).val();
+   	            	$('.filter-concurrent').val('');
+   	            	$(this).val(val);
+   	            	table.ajax.reload(undefined, false);	
+   	            });
+
+   	            $('.filter').on('change', function() {
+   	            	table.ajax.reload(undefined, false);	
+   	            });
+   	            
+	        });
+	        
+	        function actionRenderer(data, meta, row) {
+	        	return '<a href="./edit.html?id=' + row.idMelody + '"><button>Edit</button></a><br>' +  
+	        		'<button class="delete-btn" onclick="deleteMelody(' + row.idMelody + ')">Delete</button>'; 
+	        }
+	        
+	        function deleteMelody(id) {
+   	         	$.ajax({
+	                url: './remove/' + id,
+    	            contentType: 'application/json; charset=utf-8',
+        	        method: 'DELETE'
+         		}).done(function(data, textStatus, jqXHR) {
+         			table.ajax.reload(undefined, false);
+         		}).fail(function(jqXHR, textStatus, errorThrown) {
+            		alert(jqXHR.responseText);
+         		});
+	        }
+	        
+        </script>
+	
+</head>
+<body>
+	<h3>Melody list</h3>
+	<a href="./edit.html">
+		<button class="add">Add new melody</button>
+	</a>	
+	<br><br>
+	<table id="datatable" class="table table-bordered" border="1">
+		<thead>
+			<tr>
+				<th width="5%">Id</th>
+				<th width="8%">Actions</th>
+				<th width="8%">Title</th>
+				<th width="8%">Artist</th>
+				<th width="8%">Tags</th>
+				<th>Lyric</th>
+			</tr>
+			<tr>
+				<th><input class="filter-concurrent" type="text" style="width: 100%;" id="id"></th>
+				<th></th>
+				<th><input class="filter-concurrent" type="text" style="width: 100%;" id="title"></th>
+				<th><input class="filter-concurrent" type="text" style="width: 100%;" id="artist"></th>
+				<th></th>
+				<th>
+					<input class="filter-concurrent" type="text" style="width: 80%;" id="lyric">
+					<label for="lyric_ru">By stemmer</label>
+					<input class="filter" type="checkbox" id="lyric_ru">
+				</th>
+			</tr>
+		</thead>
+	</table>
+
+</body>
+
+</html>
