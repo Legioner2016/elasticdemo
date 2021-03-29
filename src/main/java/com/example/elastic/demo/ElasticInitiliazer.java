@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.elasticsearch.action.admin.indices.forcemerge.ForceMergeRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.RequestOptions;
@@ -64,19 +65,27 @@ public class ElasticInitiliazer {
 						melody.setLyric(lyrics.get(m.getIdMelody()));
 						return melody; 
 					}).collect(Collectors.toList());
-			BulkRequest bulkRequest = new BulkRequest();
-			indexMelodies.forEach(m -> {
-				IndexRequest indexRequest = new IndexRequest("melody").id(m.getIdMelody().toString())
-							.source("id_melody", m.getIdMelody(), "artist", m.getArtist(), 
-									"title", m.getTitle(), "lyric", m.getLyric());
-				bulkRequest.add(indexRequest);
-			});
-			restHighLevelClient.bulk(bulkRequest, RequestOptions.DEFAULT);
+			if (!indexMelodies.isEmpty()) {
+				BulkRequest bulkRequest = new BulkRequest();
+				indexMelodies.forEach(m -> {
+					IndexRequest indexRequest = new IndexRequest("melody").id(m.getIdMelody().toString())
+								.source("id_melody", m.getIdMelody(), "artist", m.getArtist(), 
+										"title", m.getTitle(), "lyric", m.getLyric());
+					bulkRequest.add(indexRequest);
+				});
+				restHighLevelClient.bulk(bulkRequest, RequestOptions.DEFAULT);
+			}
 			log.info("done: " + melodies.size());
 			from += step;
 		}
 
-
+		//Теоритечески - это удалит все старые версии докентов и уменьшит размер используемого для хранения индекса места
+		//На практике этого можно не делать - elastic сам выполнит удаление помеченных как удаленные документы, 
+		//при приближении к границам размера сегмента. Вот только я так и не понял - где этот размер по умолчанию
+		ForceMergeRequest cleanRequest = new ForceMergeRequest("melody").maxNumSegments(1).flush(true);
+		//ForceMergeRequest cleanRequest = new ForceMergeRequest("melody").onlyExpungeDeletes(true).flush(true);
+		restHighLevelClient.indices().forcemergeAsync(cleanRequest, RequestOptions.DEFAULT, null);
+		
 		((ConfigurableApplicationContext)context).close();
 	}
 

@@ -25,9 +25,11 @@ public class Melody {
 	@Id
 	@Field(type = FieldType.Keyword, store = true, name = "id_melody")
 	Integer		idMelody;
-	@Field(type = FieldType.Text, analyzer = "standard_edge_ngram")
+	@MultiField(mainField = @Field(type = FieldType.Text, analyzer = "standard_edge_ngram"), 
+			otherFields = {@InnerField(suffix = "pre", type = FieldType.Text, analyzer = "keyword_analyzer") })
 	String 		title;
-	@Field(type = FieldType.Text, analyzer = "standard_edge_ngram")
+	@MultiField(mainField = @Field(type = FieldType.Text, analyzer = "standard_edge_ngram"), 
+			otherFields = {@InnerField(suffix = "pre", type = FieldType.Text, analyzer = "keyword_analyzer") })
 	String 		artist;
 	@MultiField(mainField = @Field(type = FieldType.Text, analyzer = "standard_ngram"), 
 			otherFields = {@InnerField(suffix = "ru", type = FieldType.Text, analyzer = "russian_analyzer") })

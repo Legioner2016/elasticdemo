@@ -24,9 +24,11 @@ public interface MelodyRepository extends ElasticsearchRepository<Melody, Intege
 	
 	Optional<Melody>		findById(Integer idMelody);
 	
-	@Query(value="{\"bool\":{\"must\":{\"match_phrase\":{\"title\":\"?0\"}}}}")
+	@Query("{\"bool\" :   { \"must\" : [ {\"match_phrase_prefix\" : { \"title\" : {\"query\":"
+	+ "\"?0\", \"boost\" : 1}}}, {\"match_phrase_prefix\" : {\"title.pre\" : {\"query\": \"?0\", \"boost\": 3}}}]}}")
 	Page<Melody> 			findByTitleStartingWith(String title, Pageable page);
-	@Query(value="{\"bool\":{\"must\":{\"match_phrase\":{\"artist\":\"?0\"}}}}")
+	@Query("{\"bool\" :   { \"must\" : [ {\"match_phrase_prefix\" : { \"artist\" : {\"query\":"
+	+ "\"?0\", \"boost\" : 1}}}, {\"match_phrase_prefix\" : {\"artist.pre\" : {\"query\": \"?0\", \"boost\": 3}}}]}}")
 	Page<Melody> 			findByArtistStartingWith(String artist, Pageable page);
 	Page<Melody> 			findAll(Pageable page);
 	

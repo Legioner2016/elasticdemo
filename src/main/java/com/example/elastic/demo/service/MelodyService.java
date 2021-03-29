@@ -207,7 +207,8 @@ public class MelodyService {
 		searchSourceBuilder.size(0);
 
 		BoolQueryBuilder qb = QueryBuilders.boolQuery();
-		qb.must(QueryBuilders.matchPhraseQuery(field, title));
+		qb.must(QueryBuilders.matchPhraseQuery(field, title).boost(1f));
+		qb.must(QueryBuilders.matchPhraseQuery(field + ".pre", title).boost(3f));
 
 		searchRequest.indices(INDEX_NAME);
 		searchRequest.source(searchSourceBuilder);

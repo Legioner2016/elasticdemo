@@ -2,6 +2,14 @@
   "index" : {
   		"max_ngram_diff" : 15,
   		"analysis" : {
+  			"char_filter" : {
+  				"russian_char_filter" :{
+   					"type": "mapping",
+   					"mappings": [
+       					"ё => е"
+			      	]
+    			}  				
+  			},
   			"filter" : {
   				"edge_ngram_15" : {
 					"type" : "edge_ngram",
@@ -30,6 +38,11 @@
   				"russian_analyzer" : {
   					"tokenizer" : "short_tokenizer",
   					"filter" : ["lowercase", "russian_stemmer"]
+  				},
+  				"keyword_analyzer" : {
+					"char_filter": ["russian_char_filter"],  				
+  					"tokenizer" : "keyword",
+  					"filter" : ["lowercase"]
   				}
   			},
   			"tokenizer" : {
